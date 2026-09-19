@@ -5,14 +5,14 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
 
-import authRoutes from './src/routes/auth.js';
-import filesRoutes from './src/routes/files.js';
-import parseRoutes from './src/routes/parse.js';
-import adminRoutes from './src/routes/admin.js';
-import historyRoutes from './src/routes/history.js';
+import authRoutes from './routes/auth.js';
+import filesRoutes from './routes/files.js';
+import parseRoutes from './routes/parse.js';
+import adminRoutes from './routes/admin.js';
+import historyRoutes from './routes/history.js';
 
-import { errorHandler } from './src/middleware/errorHandler.js';
-import connectDB from './src/config/db.js';
+import { errorHandler } from './middleware/errorHandler.js';
+import connectDB from './config/db.js';
 
 dotenv.config();
 
