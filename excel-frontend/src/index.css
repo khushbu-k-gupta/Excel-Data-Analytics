@@ -1,0 +1,100 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap");
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-primary: #0b0d12;
+    --bg-card: #12151c;
+    --bg-elevated: #1a1e28;
+    --border: rgba(255, 255, 255, 0.08);
+    --text-muted: #94a3b8;
+    --accent: #10b981;
+    --accent-glow: rgba(16, 185, 129, 0.35);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[#0b0d12] text-slate-100 antialiased;
+    font-family: "Inter", system-ui, sans-serif;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: #0b0d12;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a3040;
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a4256;
+  }
+}
+
+@layer components {
+
+  .font-display {
+    font-family: "Space Grotesk", sans-serif;
+  }
+
+  .card {
+    @apply bg-[#12151c] border border-white/[0.08] rounded-2xl;
+  }
+
+  .btn-accent {
+    @apply bg-emerald-500 text-slate-950 font-semibold rounded-full px-5 py-2.5
+           hover:bg-emerald-400 transition-all duration-200
+           hover:shadow-[0_0_24px_var(--accent-glow)] active:scale-95;
+  }
+
+  .btn-ghost {
+    @apply text-slate-300 hover:text-white hover:bg-white/5
+           rounded-full px-5 py-2.5 transition-colors duration-200;
+  }
+
+  .input-dark {
+    @apply w-full bg-[#12151c] border border-white/10 rounded-xl px-4 py-2.5
+           text-sm placeholder:text-slate-500 transition
+           focus:outline-none focus:border-emerald-500/60
+           focus:ring-2 focus:ring-emerald-500/20;
+  }
+}
+
+@layer utilities {
+  .grid-pattern {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .fade-bottom {
+    mask-image: linear-gradient(to bottom, black 60%, transparent);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.6s ease-out both;
+}
