@@ -1,12 +1,12 @@
+import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 import User from "../models/User.js";
 
 dotenv.config();
 
 export const register = async (req, res) => {
-  const { username, useremail, password, role } = req.body;
+  const { username, useremail, password } = req.body;
 
   if (!username || !useremail || !password) {
     return res
@@ -20,17 +20,22 @@ export const register = async (req, res) => {
       username,
       useremail,
       password: hashed,
-      role,
+      role: "user",
     });
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
 
     res.status(201).json({
       message: "User registered",
-      user: {
-        id: user._id,
-        username: user.username,
-        useremail: user.useremail,
-        role: user.role,
-      },
+      token,
+      role: user.role,
+      username: user.username,
+      useremail: user.useremail,
+      id: user._id,
     });
   } catch (err) {
     if (err.code === 11000) {
@@ -44,33 +49,37 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
+  const identifier = username || email;
+
+  if (!identifier || !password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
 
   try {
     const user = await User.findOne({
-      $or: [{ username }, { useremail: username }],
+      $or: [{ username: identifier }, { useremail: identifier }],
     });
 
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ error: "Invalid credentials" });
-
+    if (!match) return res.status(401).json({ message: "Invalid credentials" });
+    if (user.status === "blocked") {
+      return res
+        .status(403)
+        .json({ message: "Account suspended. Contact support." });
+    }
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "1d" },
     );
 
-    res.json({
-      token,
-      role: user.role,
-      username: user.username,
-      useremail: user.useremail,
-    });
+    res.json({ token, role: user.role, username: user.username, id: user._id });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -81,8 +90,10 @@ export const getProfile = async (req, res) => {
     res.json({
       name: user.username,
       email: user.useremail,
-      role: user.role || "User",
-    }); 
+      role: user.role || "user",
+      avatar: user.avatar || null, // 🆕
+      createdAt: user.createdAt, // 🆕 member since
+    });
   } catch {
     res.status(500).json({ message: "Server error" });
   }
@@ -96,7 +107,6 @@ export const updateProfile = async (req, res) => {
   }
 
   try {
-
     const existingUser = await User.findOne({
       useremail,
       _id: { $ne: req.user.id },
@@ -125,11 +135,14 @@ export const updateProfile = async (req, res) => {
 
 export const changePassword = async (req, res) => {
   const { oldpassword: oldPassword, newpassword: newPassword } = req.body;
-  console.log(oldPassword, newPassword);
 
   if (!oldPassword || !newPassword)
     return res.status(400).json({ message: "Old and new password required" });
 
+  if (newPassword.length < 6)
+    return res
+      .status(400)
+      .json({ message: "New password must be at least 6 characters" });
 
   try {
     const user = await User.findById(req.user.id);
