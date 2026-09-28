@@ -8,7 +8,7 @@ const AdminRoute = ({ children }) => {
   if (!token) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
-  // User hai lekin admin nahi — usko uske ghar bhejo 😄
+
   if (user?.role !== 'admin') {
     return <Navigate to="/dashboard" replace />;
   }

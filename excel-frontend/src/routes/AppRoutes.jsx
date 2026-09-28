@@ -20,11 +20,10 @@ import Profile from "../pages/profile/Profile";
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public */}
+      
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Protected — user */}
       <Route element={<UserLayout />}>
         <Route path="/" element={<Landing />} />
         <Route
@@ -62,7 +61,6 @@ const AppRoutes = () => {
         />
       </Route>
 
-      {/* Admin — nested routes ANDAR */}
       <Route
         path="/admin"
         element={
@@ -71,13 +69,12 @@ const AppRoutes = () => {
           </AdminRoute>
         }
       >
-        <Route index element={<AdminOverview />} /> {/* ✅ /admin */}
-        <Route path="users" element={<AdminUsers />} /> {/* ✅ /admin/users */}
-        <Route path="files" element={<AdminFiles />} /> {/* ✅ /admin/files */}
+        <Route index element={<AdminOverview />} /> 
+        <Route path="users" element={<AdminUsers />} /> 
+        <Route path="files" element={<AdminFiles />} />
         <Route path="users/:id" element={<AdminUserDetail />} />
       </Route>
 
-      {/* 404 — sabse neeche, catch-all */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
